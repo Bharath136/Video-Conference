@@ -4,6 +4,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
 import { ActivatedRoute, Router } from '@angular/router';
 import { io } from 'socket.io-client';
 import { Observable } from 'rxjs';
+import { Socket } from 'ngx-socket-io';
 
 interface ChatMessage {
   sender: string;
@@ -24,10 +25,13 @@ interface ChatMessage {
 })
 export class RoomComponent implements OnInit {
 
+  
   @ViewChild('screenVideoElement') screenVideoElement!: ElementRef<HTMLVideoElement>;
   localStream: MediaStream | null = null;
-
+  @ViewChild('localVideo') localVideoRef!: ElementRef;
   videoStreams: MediaStream[] = [];
+
+
   isAudioMuted = false;
   isVideoOff = false;
   isRecording = false;
@@ -42,6 +46,7 @@ export class RoomComponent implements OnInit {
   showParticipants = false;
   currentUser: string = '';
   localVideo: any;
+  localVideoElement: any;
 
   constructor(private router: Router, private route: ActivatedRoute) {
     this.socket = io('http://localhost:3000');
@@ -52,6 +57,7 @@ export class RoomComponent implements OnInit {
     console.log(this.videoStreams)
   }
 
+  
   getCurrentTime(): string {
     const currentTime = new Date();
     const hours = currentTime.getHours().toString().padStart(2, '0');
@@ -91,18 +97,6 @@ export class RoomComponent implements OnInit {
 
     console.log('Emitting join-room event');
     this.socket.emit('join-room', roomId, userId, username, meetingType);
-
-    // this.socket.on('user-connected', (participant: string) => {
-    //   console.log(`User ${participant} connected`);
-    // });
-
-    // this.socket.on('createMessage', (message: string, username: string) => {
-    //   console.log(`${username}: ${message}`);
-    // });
-
-    // this.socket.on('user-disconnected', (userId: string) => {
-    //   console.log(`User ${userId} disconnected`);
-    // });
   }
 
   openCamera() {
@@ -115,6 +109,30 @@ export class RoomComponent implements OnInit {
       console.log('Error accessing camera:', error);
     });
   }
+
+  // openCamera() {
+  //   // Get the local video stream and display it in the video element
+  //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  //     .then((stream) => {
+  //       const localVideoElement = this.localVideoElement.nativeElement;
+  //       localVideoElement.srcObject = stream;
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error accessing user media:', error);
+  //     });
+  // }
+
+  // openCamera() {
+  //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  //     .then((stream: MediaStream) => {
+  //       this.localStream = stream;
+  //       this.localVideoRef.nativeElement.srcObject = stream;
+  //       this.localVideoRef.nativeElement.play();
+  //     })
+  //     .catch((error: any) => {
+  //       console.log('Error accessing camera:', error);
+  //     });
+  // }
 
   toggleAudio() {
     this.isAudioMuted = !this.isAudioMuted;
@@ -265,174 +283,7 @@ getNewChatArrivals(): Observable<ChatMessage> {
 }
 
 
-// import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-// import { trigger, state, style, transition, animate } from '@angular/animations';
-
-// import { ActivatedRoute, Router } from '@angular/router';
-// import { io } from 'socket.io-client';
-// import { Observable } from 'rxjs';
-
-// interface ChatMessage {
-//   sender: string;
-//   content: string;
-// }
-
-// @Component({
-//   selector: 'app-room',
-//   templateUrl: './room.component.html',
-//   styleUrls: ['./room.component.css'],
-//   animations: [
-//     trigger('slideAnimation', [
-//       state('open', style({ left: '0' })),
-//       state('closed', style({ left: '-100%' })),
-//       transition('open <=> closed', animate('0.3s ease')),
-//     ]),
-//   ],
-// })
-// export class RoomComponent implements OnInit {
-
-//   @ViewChild('screenVideoElement') screenVideoElement!: ElementRef<HTMLVideoElement>;
-//   localStream: MediaStream | null = null;
-
-//   videoStreams: MediaStream[] = [];
-//   isAudioMuted = false;
-//   isVideoOff = false;
-//   isRecording = false;
-//   isChatOpen = true;
-//   isScreenSharing = false;
-//   chatMessages: ChatMessage[] = [];
-//   participants: any[] = [];
-//   newMessage: string = '';
-//   socket: any;
-//   mediaRecorders: any;
-//   mediaRecorder: any;
-//   showParticipants = false;
-//   currentUser: string = '';
-//   localVideo: any;
-//   // private socket!: Socket;
-
-//   constructor(private router: Router, private route: ActivatedRoute) {
-//     this.socket = io('http://localhost:3000');
-//     const token = localStorage.getItem('jwtToken')
-//     if (!token) {
-//       this.router.navigate(['/login'])
-//     }
-//     console.log(this.videoStreams)
-//   }
-//   // private socket!: Socket;
-
-//   // @ViewChild('localVideo') localVideo!: ElementRef;
-//   // localStream: MediaStream | null = null;
-
-//   ngOnInit() {
-//     this.currentUser = localStorage.getItem('username') || ''
-//     this.openCamera();
-//     this.joinRoom();
-//     this.getNewChatArrivals().subscribe((data: ChatMessage) => {
-//       this.chatMessages.push(data);
-//     });
-//     const roomId = this.route.snapshot.paramMap.get('id');
-//     this.socket.emit('get-participants', roomId);
-//     this.socket.on('participants', (participants: any[]) => {
-//       this.participants = participants;
-//     });
-
-//   }
-
-//   getNewChatArrivals(): Observable<ChatMessage> {
-//     return new Observable((observer) => {
-//       this.socket.on('createMessage', (message: string, username: string) => {
-//         const chatMessage: ChatMessage = {
-//           sender: username,
-//           content: message
-//         };
-//         observer.next(chatMessage);
-//       });
-//     });
-//   }
-
-//   joinRoom() {
-//     const roomId = this.route.snapshot.paramMap.get('id');
-//     const userId = localStorage.getItem('userId');
-//     const username = localStorage.getItem('username');
-//     const meetingType = localStorage.getItem('meetType');
-
-//     console.log('Emitting join-room event');
-//     this.socket.emit('join-room', roomId, userId, username, meetingType);
-
-//     // this.socket.on('user-connected', (participant: string) => {
-//     //   console.log(`User ${participant} connected`);
-//     // });
-
-//     // this.socket.on('createMessage', (message: string, username: string) => {
-//     //   console.log(`${username}: ${message}`);
-//     // });
-
-//     // this.socket.on('user-disconnected', (userId: string) => {
-//     //   console.log(`User ${userId} disconnected`);
-//     // });
-//   }
-
-//   // openCamera() {
-//   //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-//   //   .then((stream: MediaStream) => {
-//   //     this.videoStreams.push(stream);
-//   //     console.log(this.videoStreams)
-//   //   })
-//   //   .catch((error: any) => {
-//   //     console.log('Error accessing camera:', error);
-//   //   });
-//   // }
-
-//   openCamera() {
-//     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-//       .then((stream) => {
-//         this.localStream = stream;
-//         this.localVideo.nativeElement.srcObject = stream;
-//       })
-//       .catch((error) => {
-//         console.error('Error accessing camera:', error);
-//       });
-//   }
 
 
-//   getParticipantStream(participantId: string): MediaStream | null {
-//     // Implement logic to retrieve the participant's stream based on participantId
-//     // Return the corresponding MediaStream object or null if not available
-//     // Example: return participantStreams[participantId];
-
-//     // Placeholder implementation (returns the local stream for all participants)
-//     return this.localStream;
-//   }
-
-//   toggleCamera(participantId: string) {
-//     const participant = this.participants.find(p => p.id === participantId);
-//     if (participant) {
-//       participant.cameraOn = !participant.cameraOn;
-//       // Implement the logic to turn on/off the camera for the participant based on their ID
-//       // You can use participant.cameraOn to determine the current state and perform the necessary actions
-//     }
-//   }
-
-//   toggleMute(participantId: string) {
-//     const participant = this.participants.find(p => p.id === participantId);
-//     if (participant) {
-//       this.isAudioMuted = !this.isAudioMuted;
-//       this.videoStreams.forEach((stream: MediaStream) => {
-//         stream.getAudioTracks()[0].enabled = !this.isAudioMuted;
-//       });
-//     }
-//   }
-
-//   // toggleMute(participantId: string) {
-//   //   const participant = this.participants.find(p => p.id === participantId);
-//   //   if (participant) {
-//   //     participant.muted = !participant.muted;
-//   //     // Implement the logic to toggle the mute status for the participant based on their ID
-//   //     // You can use participant.muted to determine the current state and perform the necessary actions
-//   //   }
-//   // }
 
 
-//   // ...
-// }

@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxWebrtcModule } from 'ngx-webrtc';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -36,7 +37,8 @@ const socketConfig: SocketIoConfig = { url: 'http://localhost:3000', options: {}
     FormsModule,
     SocketIoModule,
     BrowserAnimationsModule,
-    NoopAnimationsModule
+    NoopAnimationsModule,
+    NgxWebrtcModule
   ],
   providers: [],
   bootstrap: [AppComponent]

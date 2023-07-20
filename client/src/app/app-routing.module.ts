@@ -6,11 +6,11 @@ import { RegisterComponent } from './components/register/register.component';
 import { RoomComponent } from './components/room/room.component';
 
 const routes: Routes = [
+  {path:'',component:HomeComponent},
   {path:'home', component:HomeComponent},
   {path:'login', component:LoginComponent},
   {path:'register', component:RegisterComponent},
   {path:'meet/:id',component:RoomComponent},
-  // {path:'meet/:id', component:RoomComponent},
   {path:'**', redirectTo:'/home',  pathMatch: 'full'},
   
 ];

@@ -22,6 +22,81 @@ const io = socketIO(server, {
 });
 
 
+const users = {};
+
+// const rooms = {};
+
+// io.on('connection', (socket) => {
+//   socket.on('login', (userId, username) => {
+//     // Store the user's information
+//     users[socket.id] = {
+//       id: userId,
+//       name: username,
+//     };
+
+//     // Notify the user about successful login
+//     socket.emit('login-success');
+
+//     // Handle disconnection
+//     socket.on('disconnect', () => {
+//       delete users[socket.id];
+//     });
+//   });
+
+//   socket.on('join-room', (roomId, meetingType) => {
+//     socket.join(roomId);
+
+//     if (!rooms[roomId]) {
+//       rooms[roomId] = {
+//         participants: [],
+//         meetingType: meetingType,
+//       };
+//     }
+
+//     const participant = {
+//       id: users[socket.id].id,
+//       name: users[socket.id].name,
+//       socketId: socket.id,
+//     };
+
+//     rooms[roomId].participants.push(participant);
+
+//     // Notify other participants about the new user
+//     socket.broadcast.to(roomId).emit('user-connected', participant);
+
+//     // Send list of participants to the new user
+//     const participants = rooms[roomId].participants.filter((p) => p.id !== participant.id);
+//     socket.emit('participants', participants);
+
+//     socket.on('message', (message) => {
+//       io.to(roomId).emit('createMessage', message, users[socket.id].name);
+//     });
+
+//     // Get participants based on room ID
+//     socket.on('get-participants', (roomId) => {
+//       const participants = rooms[roomId].participants;
+//       socket.emit('participants', participants);
+//     });
+
+//     socket.on('disconnect', () => {
+//       // Remove the user from the room's participant list
+//       const index = rooms[roomId].participants.findIndex((p) => p.socketId === socket.id);
+//       if (index !== -1) {
+//         rooms[roomId].participants.splice(index, 1);
+//       }
+
+//       // Notify other participants about the user's disconnection
+//       socket.broadcast.to(roomId).emit('user-disconnected', participant.id);
+
+//       // If there are no participants left, remove the room from the rooms object
+//       if (rooms[roomId].participants.length === 0) {
+//         delete rooms[roomId];
+//       }
+//     });
+//   });
+// });
+
+
 
 const rooms = {};
 
